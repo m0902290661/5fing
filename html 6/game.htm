@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>五子棋遊戲</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(15, 30px);
+            grid-template-rows: repeat(15, 30px);
+            gap: 1px;
+            border: 1px solid #000;
+            width: 450px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+        }
+
+        .cell:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>五子棋遊戲</h1>
+    <div id="menu">
+        <button onclick="startNewGame()">開始新遊戲</button>
+        <button onclick="resetBoard()">重置棋盤</button>
+    </div>
+    <div class="board" id="board"></div>
+
+    <script>
+        const board = document.getElementById("board");
+        let currentPlayer = "X";
+        const cells = [];
+
+        function createCell(row, col) {
+            const cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.addEventListener("click", handleCellClick);
+            board.appendChild(cell);
+            cells.push(cell);
+        }
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            if (!cell.classList.contains("cell") || cell.textContent !== "") return;
+            cell.textContent = currentPlayer;
+            checkWin(cell);
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+        }
+
+        function checkWin(cell) {
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            const directions = [
+                [-1, 0], [1, 0], [0, -1], [0, 1],
+                [-1, -1], [1, 1], [-1, 1], [1, -1]
+            ];
+
+            for (const [dx, dy] of directions) {
+                let count = 1;
+                for (let i = 1; i <= 4; i++) {
+                    const newRow = row + i * dx;
+                    const newCol = col + i * dy;
+                    const adjacentCell = cells.find(cell => {
+                        return parseInt(cell.dataset.row) === newRow &&
+                            parseInt(cell.dataset.col) === newCol;
+                    });
+                    if (adjacentCell && adjacentCell.textContent === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+
+                for (let i = 1; i <= 4; i++) {
+                    const newRow = row - i * dx;
+                    const newCol = col - i * dy;
+                    const adjacentCell = cells.find(cell => {
+                        return parseInt(cell.dataset.row) === newRow &&
+                            parseInt(cell.dataset.col) === newCol;
+                    });
+                    if (adjacentCell && adjacentCell.textContent === currentPlayer) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (count >= 5) {
+                    alert(currentPlayer + "贏了！");
+                    resetBoard();
+                    return;
+                }
+            }
+        }
+
+        function resetBoard() {
+            cells.forEach(cell => {
+                cell.textContent = "";
+            });
+            currentPlayer = "X";
+        }
+
+        for (let i = 0; i < 15; i++) {
+            for (let j = 0; j < 15; j++) {
+                createCell(i, j);
+            }
+        }
+        function startNewGame() {
+            resetBoard();
+        }
+
+        function resetBoard() {
+            cells.forEach(cell => {
+                cell.textContent = "";
+            });
+            currentPlayer = "X";
+        }
+
+        for (let i = 0; i < 15; i++) {
+            for (let j = 0; j < 15; j++) {
+                createCell(i, j);
+            }
+        }
+    </script>
+</body>
+</html>
